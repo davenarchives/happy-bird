@@ -126,7 +126,7 @@ export function initGame() {
   const pauseToggle = (force) => {
     const newVal = typeof force === 'boolean' ? force : !state.paused;
     state.paused = newVal;
-    if (!newVal && state.mode === 'playing') {
+    if (!newVal && (state.mode === 'playing' || state.mode === 'dying')) {
       state.lastTime = performance.now();
       requestAnimationFrame(loop);
     }
@@ -165,9 +165,16 @@ export function initGame() {
     return dx * dx + dy * dy <= r * r;
   };
 
+  const beginCrash = () => {
+    if (state.mode !== 'playing') return;
+    state.mode = 'dying';
+    bird.vy = Math.max(4, Math.abs(bird.vy));
+  };
+
   const update = (dt) => {
     const step = dt * 60;
-    const speed = currentSpeed();
+    const isDying = state.mode === 'dying';
+    const speed = isDying ? 0 : currentSpeed();
     state.acc = speed;
 
     bird.vy += world.gravity * step;
@@ -181,6 +188,11 @@ export function initGame() {
     if (bird.y + bird.r > world.floorY) {
       bird.y = world.floorY - bird.r;
       die();
+      return;
+    }
+
+    if (isDying) {
+      return;
     }
 
     nextPipeAt -= dt * 1000;
@@ -209,7 +221,7 @@ export function initGame() {
         rectsCollide(bird.x, bird.y, bird.r, topRect.x, topRect.y, topRect.w, topRect.h) ||
         rectsCollide(bird.x, bird.y, bird.r, bottomRect.x, bottomRect.y, bottomRect.w, bottomRect.h)
       ) {
-        die();
+        beginCrash();
         break;
       }
     }
@@ -433,14 +445,14 @@ export function initGame() {
   };
 
   const loop = (timestamp) => {
-    if (state.mode !== 'playing') return;
+    if (state.mode !== 'playing' && state.mode !== 'dying') return;
     const dt = Math.min(0.033, (timestamp - state.lastTime) / 1000 || 0);
     if (!state.paused) {
       state.lastTime = timestamp;
       update(dt);
     }
     render();
-    if (!state.paused && state.mode === 'playing') {
+    if (!state.paused && (state.mode === 'playing' || state.mode === 'dying')) {
       requestAnimationFrame(loop);
     }
   };
