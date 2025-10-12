@@ -37,7 +37,7 @@ export function initGame() {
   const bird = {
     x: 80,
     y: CANVAS_SIZE.height / 2,
-    r: 14,
+    r: 16,
     vy: 0,
     rot: 0,
   };
@@ -291,36 +291,57 @@ export function initGame() {
     ctx.save();
     ctx.translate(bird.x, bird.y);
     ctx.rotate(bird.rot * 0.4);
+    const bodyWidth = bird.r * 1.15;
+    const bodyHeight = bird.r * 0.9;
+    const wingLift = Math.max(-bird.vy * 0.18, 0);
+
+    ctx.fillStyle = '#dc2626';
+    ctx.beginPath();
+    ctx.moveTo(-bodyWidth * 0.85, -bodyHeight * 0.1);
+    ctx.lineTo(-bodyWidth * 1.15, 0);
+    ctx.lineTo(-bodyWidth * 0.85, bodyHeight * 0.35);
+    ctx.closePath();
+    ctx.fill();
+
     ctx.fillStyle = '#f43f5e';
     ctx.beginPath();
-    ctx.arc(0, 0, bird.r, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, bodyWidth, bodyHeight, 0, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = '#fecaca';
     ctx.beginPath();
-    ctx.arc(2, 3, bird.r * 0.65, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(5, -5, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#0f172a';
-    ctx.beginPath();
-    ctx.arc(6.5, -5, 2, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#f59e0b';
-    ctx.beginPath();
-    ctx.moveTo(bird.r * 0.2, 0);
-    ctx.lineTo(bird.r * 1.1, 3);
-    ctx.lineTo(bird.r * 0.2, 6);
-    ctx.closePath();
+    ctx.ellipse(-bodyWidth * 0.1, bodyHeight * 0.25, bodyWidth * 0.65, bodyHeight * 0.65, -0.2, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = '#ef4444';
     ctx.beginPath();
-    ctx.ellipse(-3, 2, 7, 5 + Math.max(-bird.vy * 0.2, 0), 0, 0, Math.PI * 2);
+    ctx.ellipse(
+      -bodyWidth * 0.05,
+      bodyHeight * 0.2,
+      bodyWidth * 0.55,
+      bodyHeight * 0.55 + wingLift,
+      -0.25,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
+
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(bodyWidth * 0.45, -bodyHeight * 0.35, bird.r * 0.45, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(bodyWidth * 0.6, -bodyHeight * 0.32, bird.r * 0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.moveTo(bodyWidth * 0.7, -bodyHeight * 0.05);
+    ctx.lineTo(bodyWidth * 1.2, bird.r * 0.1);
+    ctx.lineTo(bodyWidth * 0.65, bird.r * 0.35);
+    ctx.closePath();
     ctx.fill();
     ctx.restore();
   };
