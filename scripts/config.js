@@ -8,7 +8,7 @@ export const WORLD = {
   jumpV: -6.4,
   baseSpeed: 1.32,
   speedRampPerScore: 0.05,
-  pipeGap: 150,
+  pipeGap: 120,
   pipeWidth: 64,
   pipeSpawnMsRange: [2300, 2800],
   floorY: CANVAS_SIZE.height - 90,
