@@ -346,6 +346,7 @@ export function initGame() {
     const bodyWidth = bird.r * 1.15;
     const bodyHeight = bird.r * 0.9;
     const wingLift = Math.max(-bird.vy * 0.18, 0);
+    const showDeadEye = state.mode === 'dying' || state.mode === 'gameover';
 
     ctx.fillStyle = '#dc2626';
     ctx.beginPath();
@@ -380,13 +381,30 @@ export function initGame() {
 
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(bodyWidth * 0.45, -bodyHeight * 0.35, bird.r * 0.45, 0, Math.PI * 2);
+    const eyeX = bodyWidth * 0.45;
+    const eyeY = -bodyHeight * 0.35;
+    const eyeRadius = bird.r * 0.45;
+    ctx.arc(eyeX, eyeY, eyeRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#0f172a';
-    ctx.beginPath();
-    ctx.arc(bodyWidth * 0.6, -bodyHeight * 0.32, bird.r * 0.2, 0, Math.PI * 2);
-    ctx.fill();
+    if (showDeadEye) {
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = bird.r * 0.18;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      const eyeSpanX = eyeRadius * 0.7;
+      const eyeSpanY = eyeRadius * 0.45;
+      ctx.beginPath();
+      ctx.moveTo(eyeX - eyeSpanX, eyeY - eyeSpanY);
+      ctx.lineTo(eyeX + eyeSpanX, eyeY);
+      ctx.lineTo(eyeX - eyeSpanX, eyeY + eyeSpanY);
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(bodyWidth * 0.6, -bodyHeight * 0.32, bird.r * 0.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     ctx.fillStyle = '#f59e0b';
     ctx.beginPath();
