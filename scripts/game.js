@@ -312,14 +312,6 @@ export function initGame() {
       ctx.fillRect(pipe.x + bodyWidth - 3 - offset, 0, 3, pipe.topH);
       ctx.fillRect(pipe.x + bodyWidth - 3 - offset, bottomY, 3, world.floorY - bottomY);
 
-      ctx.fillStyle = 'rgba(0,0,0,0.1)';
-      for (let y = 6; y < pipe.topH; y += 18) {
-        ctx.fillRect(pipe.x, y, bodyWidth, 2);
-      }
-      for (let y = bottomY + 6; y < world.floorY; y += 18) {
-        ctx.fillRect(pipe.x, y, bodyWidth, 2);
-      }
-
       const capGradient = ctx.createLinearGradient(pipe.x - 4, 0, pipe.x + bodyWidth + 4, 0);
       capGradient.addColorStop(0, '#2e9f28');
       capGradient.addColorStop(0.5, '#7df55c');
@@ -348,7 +340,7 @@ export function initGame() {
     const wingLift = Math.max(-bird.vy * 0.18, 0);
     const showDeadEye = state.mode === 'dying' || state.mode === 'gameover';
 
-    ctx.fillStyle = '#dc2626';
+    ctx.fillStyle = '#d97706';
     ctx.beginPath();
     ctx.moveTo(-bodyWidth * 0.85, -bodyHeight * 0.1);
     ctx.lineTo(-bodyWidth * 1.15, 0);
@@ -356,17 +348,28 @@ export function initGame() {
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = '#f43f5e';
+    const bodyGradient = ctx.createRadialGradient(
+      0,
+      -bodyHeight * 0.25,
+      bodyWidth * 0.25,
+      0,
+      0,
+      bodyWidth * 1.05
+    );
+    bodyGradient.addColorStop(0, '#fef3c7');
+    bodyGradient.addColorStop(0.55, '#fde047');
+    bodyGradient.addColorStop(1, '#eab308');
+    ctx.fillStyle = bodyGradient;
     ctx.beginPath();
     ctx.ellipse(0, 0, bodyWidth, bodyHeight, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#fecaca';
+    ctx.fillStyle = '#fef08a';
     ctx.beginPath();
     ctx.ellipse(-bodyWidth * 0.1, bodyHeight * 0.25, bodyWidth * 0.65, bodyHeight * 0.65, -0.2, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#ef4444';
+    ctx.fillStyle = '#fbbf24';
     ctx.beginPath();
     ctx.ellipse(
       -bodyWidth * 0.05,
@@ -378,6 +381,17 @@ export function initGame() {
       Math.PI * 2
     );
     ctx.fill();
+    ctx.strokeStyle = 'rgba(217,119,6,0.45)';
+    ctx.lineWidth = bird.r * 0.12;
+    ctx.lineCap = 'round';
+    const featherCount = 3;
+    for (let i = 0; i < featherCount; i++) {
+      const featherProgress = (i + 1) / (featherCount + 1);
+      const y = bodyHeight * 0.05 + featherProgress * bodyHeight * 0.5;
+      ctx.beginPath();
+      ctx.arc(-bodyWidth * 0.15, y, bodyWidth * 0.35, Math.PI * 0.1, Math.PI * 0.9);
+      ctx.stroke();
+    }
 
     ctx.fillStyle = '#fff';
     ctx.beginPath();

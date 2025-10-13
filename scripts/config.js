@@ -32,5 +32,6 @@ export const DEATH_VIDEOS = [
   'relapse/sayo.mp4',
   'relapse/hanggangkailan.mp4',
   'relapse/masyadopangmaaga.mp4',
-  'relapse/ere.mp4',
+  'relapse/malayko.mp4',
+  
 ];
