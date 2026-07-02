@@ -1,10 +1,10 @@
-const CACHE_NAME = "happy-bird-cache-v2";
+const CACHE_NAME = "happy-bird-cache-v3";
 const FILES_TO_CACHE = [
   "/",
   "/index.html",
   "/styles/style.css",
   "/scripts/main.js",
-  "/images/icon.png",
+  "/images/happybirdlogo.png",
   "/images/happybird.png",
   "/manifest.json"
 ];
