@@ -52,18 +52,6 @@ export const recordBestScore = (state) => {
 let cachedLeaderboard = [];
 let isSupabaseInitialized = false;
 
-const loadLocalLeaderboard = () => {
-  try {
-    const raw = localStorage.getItem('fb_leaderboard');
-    if (raw) {
-      cachedLeaderboard = JSON.parse(raw);
-    }
-  } catch (e) {}
-};
-
-// Start by loading whatever we have locally
-loadLocalLeaderboard();
-
 export const syncLeaderboard = async () => {
   if (!isSupabaseInitialized) {
     initSupabase();
@@ -73,11 +61,10 @@ export const syncLeaderboard = async () => {
   const data = await fetchLeaderboard();
   if (data) {
     cachedLeaderboard = data;
-    localStorage.setItem('fb_leaderboard', JSON.stringify(cachedLeaderboard));
   }
 };
 
-// Kick off initial sync silently
+// Kick off initial fetch from Supabase
 syncLeaderboard();
 
 export const getLeaderboard = () => {
@@ -87,13 +74,12 @@ export const getLeaderboard = () => {
 export const addLeaderboardScore = (name, score) => {
   const finalName = name || 'Player';
   
-  // Optimistically update local cache
+  // Optimistically update memory so it shows instantly for the player
   cachedLeaderboard.push({ name: finalName, score });
   cachedLeaderboard.sort((a, b) => b.score - a.score);
   cachedLeaderboard.splice(10);
-  localStorage.setItem('fb_leaderboard', JSON.stringify(cachedLeaderboard));
   
-  // Push to Supabase asynchronously and re-sync
+  // Push to Supabase and then pull the absolute truth
   insertScore(finalName, score).then(() => {
     syncLeaderboard();
   });
