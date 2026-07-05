@@ -287,6 +287,35 @@ const BIRD_COLORS = {
   '8': '#b2dfdc', // Light cyan eye highlight
 };
 
+const birdCanvasCache = [];
+
+const getBirdCanvas = (frameIdx) => {
+  if (birdCanvasCache[frameIdx]) return birdCanvasCache[frameIdx];
+
+  const birdPixels = flappyFrames[frameIdx];
+  const pixelSize = 3;
+  const spriteWidth = birdPixels[0].length * pixelSize;
+  const spriteHeight = birdPixels.length * pixelSize;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = spriteWidth;
+  canvas.height = spriteHeight;
+  const ctx = canvas.getContext('2d');
+
+  for (let row = 0; row < birdPixels.length; row++) {
+    for (let column = 0; column < birdPixels[row].length; column++) {
+      const pixel = birdPixels[row][column];
+      const color = BIRD_COLORS[pixel];
+      if (!color) continue;
+      ctx.fillStyle = color;
+      ctx.fillRect(column * pixelSize, row * pixelSize, pixelSize, pixelSize);
+    }
+  }
+
+  birdCanvasCache[frameIdx] = canvas;
+  return canvas;
+};
+
 const drawBird = (ctx, state, bird) => {
   const time = performance.now();
   let frameIdx = 1;
@@ -300,14 +329,9 @@ const drawBird = (ctx, state, bird) => {
     frameIdx = Math.floor(time / 80) % 3;
   }
 
-  const birdPixels = flappyFrames[frameIdx];
-
-  // IMPORTANT:
-  // Pixel art must use an integer pixel size.
   const pixelSize = 3;
-
-  const spriteWidth = birdPixels[0].length * pixelSize;
-  const spriteHeight = birdPixels.length * pixelSize;
+  const spriteWidth = flappyFrames[0][0].length * pixelSize;
+  const spriteHeight = flappyFrames[0].length * pixelSize;
 
   let displayY = bird.y;
 
@@ -336,27 +360,8 @@ const drawBird = (ctx, state, bird) => {
     -Math.floor(spriteHeight / 2)
   );
 
-  for (let row = 0; row < birdPixels.length; row++) {
-    for (
-      let column = 0;
-      column < birdPixels[row].length;
-      column++
-    ) {
-      const pixel = birdPixels[row][column];
-      const color = BIRD_COLORS[pixel];
-
-      if (!color) continue;
-
-      ctx.fillStyle = color;
-
-      ctx.fillRect(
-        column * pixelSize,
-        row * pixelSize,
-        pixelSize,
-        pixelSize
-      );
-    }
-  }
+  const birdCanvas = getBirdCanvas(frameIdx);
+  ctx.drawImage(birdCanvas, 0, 0);
 
   ctx.restore();
 };
@@ -521,7 +526,12 @@ const drawGameOver = (ctx, state) => {
   ctx.restore();
 };
 
-const drawTrophy = (ctx, cx, cy, scale, fillColor) => {
+const trophyCanvasCache = {};
+
+const getTrophyCanvas = (scale, fillColor) => {
+  const cacheKey = `${scale}-${fillColor}`;
+  if (trophyCanvasCache[cacheKey]) return trophyCanvasCache[cacheKey];
+
   const pixels = [
     '011111110',
     '111111111',
@@ -534,29 +544,40 @@ const drawTrophy = (ctx, cx, cy, scale, fillColor) => {
     '000111000',
     '001111100',
   ];
-  
+
   const w = pixels[0].length * scale;
   const h = pixels.length * scale;
-  const startX = cx - w / 2;
-  const startY = cy - h / 2;
-  
+
+  const canvas = document.createElement('canvas');
+  canvas.width = w + 2;
+  canvas.height = h + 2;
+  const ctx = canvas.getContext('2d');
+
   ctx.fillStyle = '#000';
   for (let r = 0; r < pixels.length; r++) {
     for (let c = 0; c < pixels[r].length; c++) {
       if (pixels[r][c] === '1') {
-        ctx.fillRect(startX + c * scale + 2, startY + r * scale + 2, scale + 0.5, scale + 0.5);
+        ctx.fillRect(c * scale + 2, r * scale + 2, scale + 0.5, scale + 0.5);
       }
     }
   }
-  
+
   ctx.fillStyle = fillColor;
   for (let r = 0; r < pixels.length; r++) {
     for (let c = 0; c < pixels[r].length; c++) {
       if (pixels[r][c] === '1') {
-        ctx.fillRect(startX + c * scale, startY + r * scale, scale + 0.5, scale + 0.5);
+        ctx.fillRect(c * scale, r * scale, scale + 0.5, scale + 0.5);
       }
     }
   }
+
+  trophyCanvasCache[cacheKey] = { canvas, w, h };
+  return trophyCanvasCache[cacheKey];
+};
+
+const drawTrophy = (ctx, cx, cy, scale, fillColor) => {
+  const { canvas, w, h } = getTrophyCanvas(scale, fillColor);
+  ctx.drawImage(canvas, cx - w / 2, cy - h / 2);
 };
 
 const drawLeaderboard = (ctx, state) => {

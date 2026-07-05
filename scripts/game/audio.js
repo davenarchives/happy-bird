@@ -1,12 +1,16 @@
 const DEFAULT_POOL_SIZE = 1;
 
 const createSoundPlayer = (src, { poolSize = DEFAULT_POOL_SIZE, volume = 1 } = {}) => {
-  const players = Array.from({ length: Math.max(1, poolSize) }, () => {
-    const audio = new Audio(src);
-    audio.preload = 'auto';
+  const baseAudio = new Audio(src);
+  baseAudio.preload = 'auto';
+  baseAudio.volume = volume;
+
+  const players = [baseAudio];
+  for (let i = 1; i < Math.max(1, poolSize); i++) {
+    const audio = baseAudio.cloneNode(true);
     audio.volume = volume;
-    return audio;
-  });
+    players.push(audio);
+  }
 
   let index = 0;
 

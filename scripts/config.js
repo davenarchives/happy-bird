@@ -24,14 +24,16 @@ export const DEATH_VIDEO_SKIP_DELAY_MS = 5000;
 export const DEATH_VIDEOS = [
   'relapse/alipin.mp4',
   'relapse/beer.mp4',
+  'relapse/bulong.mp4',
   'relapse/eroplanongpapel.mp4',
+  'relapse/hanggangkailan.mp4',
   'relapse/kathangisip.mp4',
+  'relapse/lifetime.mp4',
+  'relapse/malayko.mp4',
+  'relapse/masyadopangmaaga.mp4',
+  'relapse/multo.mp4',
   'relapse/nanditoako.mp4',
   'relapse/pusongligaw.mp4',
   'relapse/sayo.mp4',
-  'relapse/hanggangkailan.mp4',
-  'relapse/masyadopangmaaga.mp4',
-  'relapse/malayko.mp4',
-  'relapse/bulong.mp4',
-  
+  'relapse/walangkapalit.mp4'
 ];

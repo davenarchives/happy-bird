@@ -416,46 +416,51 @@ const LABEL_LETTERS = {
   ]
 };
 
-/**
- * Draw a single pixel-art digit on the canvas.
- * @param {CanvasRenderingContext2D} ctx
- * @param {number} digit 0-9
- * @param {number} x top-left x
- * @param {number} y top-left y
- * @param {number} scale pixel size multiplier
- * @param {string} fillColor main fill color
- * @param {string} strokeColor outline color
- */
+const spriteDigitCache = {};
+
 export const drawSpriteDigit = (ctx, digit, x, y, scale, fillColor = '#fff', strokeColor = '#000') => {
   const map = DIGIT_MAPS[digit];
   if (!map) return;
 
-  // Draw outline first (shifted in all 4 directions)
-  if (strokeColor && strokeColor !== 'transparent') {
-    ctx.fillStyle = strokeColor;
-    const offsets = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]];
-    for (const [ox, oy] of offsets) {
-      for (let row = 0; row < map.length; row++) {
-        for (let col = 0; col < map[row].length; col++) {
-          if (map[row][col]) {
-            // scale + 0.5 removes subpixel grid lines
-            ctx.fillRect(x + (col + ox) * scale, y + (row + oy) * scale, scale + 0.5, scale + 0.5);
+  const cacheKey = `${digit}-${scale}-${fillColor}-${strokeColor}`;
+  if (!spriteDigitCache[cacheKey]) {
+    const width = map[0].length * scale;
+    const height = map.length * scale;
+    const padding = scale * 2;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width + padding * 2;
+    canvas.height = height + padding * 2;
+    const cacheCtx = canvas.getContext('2d');
+
+    if (strokeColor && strokeColor !== 'transparent') {
+      cacheCtx.fillStyle = strokeColor;
+      const offsets = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]];
+      for (const [ox, oy] of offsets) {
+        for (let row = 0; row < map.length; row++) {
+          for (let col = 0; col < map[row].length; col++) {
+            if (map[row][col]) {
+              cacheCtx.fillRect(padding + (col + ox) * scale, padding + (row + oy) * scale, scale + 0.5, scale + 0.5);
+            }
           }
         }
       }
     }
-  }
 
-  // Draw fill
-  ctx.fillStyle = fillColor;
-  for (let row = 0; row < map.length; row++) {
-    for (let col = 0; col < map[row].length; col++) {
-      if (map[row][col]) {
-        // scale + 0.5 removes subpixel grid lines
-        ctx.fillRect(x + col * scale, y + row * scale, scale + 0.5, scale + 0.5);
+    cacheCtx.fillStyle = fillColor;
+    for (let row = 0; row < map.length; row++) {
+      for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col]) {
+          cacheCtx.fillRect(padding + col * scale, padding + row * scale, scale + 0.5, scale + 0.5);
+        }
       }
     }
+
+    spriteDigitCache[cacheKey] = { canvas, padding };
   }
+
+  const { canvas, padding } = spriteDigitCache[cacheKey];
+  ctx.drawImage(canvas, x - padding, y - padding);
 };
 
 /**
@@ -483,36 +488,54 @@ export const drawSpriteNumber = (ctx, numStr, cx, cy, scale, fillColor = '#fff',
   }
 };
 
-/**
- * Draw a single pixel-art map.
- */
+const spriteLetterCache = new Map();
+
 export const drawSpriteLetter = (ctx, letterMap, x, y, scale, fillColor, strokeColor) => {
-  // Draw outline
-  if (strokeColor && strokeColor !== 'transparent') {
-    ctx.fillStyle = strokeColor;
-    const offsets = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]];
-    for (const [ox, oy] of offsets) {
-      for (let row = 0; row < letterMap.length; row++) {
-        for (let col = 0; col < letterMap[row].length; col++) {
-          if (letterMap[row][col]) {
-            // scale + 0.5 removes subpixel grid lines
-            ctx.fillRect(x + (col + ox) * scale, y + (row + oy) * scale, scale + 0.5, scale + 0.5);
+  let cacheKeyMap = spriteLetterCache.get(letterMap);
+  if (!cacheKeyMap) {
+    cacheKeyMap = {};
+    spriteLetterCache.set(letterMap, cacheKeyMap);
+  }
+
+  const cacheKey = `${scale}-${fillColor}-${strokeColor}`;
+  if (!cacheKeyMap[cacheKey]) {
+    const width = letterMap[0].length * scale;
+    const height = letterMap.length * scale;
+    const padding = scale * 2;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width + padding * 2;
+    canvas.height = height + padding * 2;
+    const cacheCtx = canvas.getContext('2d');
+
+    if (strokeColor && strokeColor !== 'transparent') {
+      cacheCtx.fillStyle = strokeColor;
+      const offsets = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]];
+      for (const [ox, oy] of offsets) {
+        for (let row = 0; row < letterMap.length; row++) {
+          for (let col = 0; col < letterMap[row].length; col++) {
+            if (letterMap[row][col]) {
+              cacheCtx.fillRect(padding + (col + ox) * scale, padding + (row + oy) * scale, scale + 0.5, scale + 0.5);
+            }
           }
         }
       }
     }
-  }
 
-  // Draw fill
-  ctx.fillStyle = fillColor;
-  for (let row = 0; row < letterMap.length; row++) {
-    for (let col = 0; col < letterMap[row].length; col++) {
-      if (letterMap[row][col]) {
-        // scale + 0.5 removes subpixel grid lines
-        ctx.fillRect(x + col * scale, y + row * scale, scale + 0.5, scale + 0.5);
+    cacheCtx.fillStyle = fillColor;
+    for (let row = 0; row < letterMap.length; row++) {
+      for (let col = 0; col < letterMap[row].length; col++) {
+        if (letterMap[row][col]) {
+          cacheCtx.fillRect(padding + col * scale, padding + row * scale, scale + 0.5, scale + 0.5);
+        }
       }
     }
+
+    cacheKeyMap[cacheKey] = { canvas, padding };
   }
+
+  const { canvas, padding } = cacheKeyMap[cacheKey];
+  ctx.drawImage(canvas, x - padding, y - padding);
 };
 
 /**

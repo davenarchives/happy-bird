@@ -10,8 +10,17 @@ export function createVideoController(videoEl, sources = []) {
 
   let onLoadedData = null;
   let onPlaying = null;
+  let playQueue = [];
+  let lastPlayedSource = null;
 
   videoEl.preload = 'auto';
+
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  };
 
   const clearPendingVisibility = () => {
     if (onLoadedData) {
@@ -49,7 +58,22 @@ export function createVideoController(videoEl, sources = []) {
   const playRandom = () => {
     if (!sources.length) return Promise.resolve();
     clearPendingVisibility();
-    const source = sources[Math.floor(Math.random() * sources.length)];
+    
+    if (playQueue.length === 0) {
+      playQueue = [...sources];
+      shuffleArray(playQueue);
+      
+      // Ensure the same song doesn't play twice in a row when refilling the bag
+      if (playQueue.length > 1 && playQueue[playQueue.length - 1] === lastPlayedSource) {
+        const temp = playQueue[playQueue.length - 1];
+        playQueue[playQueue.length - 1] = playQueue[0];
+        playQueue[0] = temp;
+      }
+    }
+    
+    const source = playQueue.pop();
+    lastPlayedSource = source;
+    
     videoEl.classList.remove('visible');
     videoEl.src = source;
     videoEl.preload = 'auto';
