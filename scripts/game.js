@@ -320,6 +320,7 @@ export function initGame() {
     pipeManager.reset(initialPipeDelay());
     hideDeathVideo();
     renderer.render();
+    startLoop(); // Ensure the loop is always running after a reset
   };
 
   const startGame = () => {
@@ -329,12 +330,20 @@ export function initGame() {
     }
   };
 
+  let animFrameId = null;
+
+  const startLoop = () => {
+    if (!animFrameId) {
+      state.lastTime = performance.now();
+      animFrameId = requestAnimationFrame(loop);
+    }
+  };
+
   const pauseToggle = (force) => {
     const newValue = typeof force === 'boolean' ? force : !state.paused;
     state.paused = newValue;
     if (!newValue) {
-      state.lastTime = performance.now();
-      requestAnimationFrame(loop);
+      startLoop();
     }
   };
 
@@ -351,8 +360,7 @@ export function initGame() {
     audio.die();
     scheduleSkipUnlock(state, DEATH_VIDEO_SKIP_DELAY_MS);
     playDeathVideo();
-    state.lastTime = performance.now();
-    requestAnimationFrame(loop);
+    startLoop();
   };
 
   const flap = (event) => {
@@ -458,7 +466,9 @@ export function initGame() {
     }
 
     if (!state.paused) {
-      requestAnimationFrame(loop);
+      animFrameId = requestAnimationFrame(loop);
+    } else {
+      animFrameId = null;
     }
   };
 
@@ -486,14 +496,13 @@ export function initGame() {
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       pauseToggle(true);
-    } else if (state.mode === GAME_MODES.READY || state.mode === GAME_MODES.GAME_OVER) {
+    } else {
+      // Always unpause when returning to avoid getting permanently stuck
       pauseToggle(false);
     }
   });
 
   resetGame();
-  state.lastTime = performance.now();
-  requestAnimationFrame(loop);
 
   window.__fb = {
     state,
