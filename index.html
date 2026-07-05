@@ -17,16 +17,35 @@
   <meta name="twitter:image:alt" content="Happy Bird icon" />
   <title>Happy Bird</title>
   <link href="images/happybirdlogo.png" rel="icon" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css" />
 </head>
 <body>
   <div class="wrap">
     <div class="playfield">
-      <canvas id="game" width="360" height="640" aria-label="Flappy Bird game canvas" role="img"></canvas>
+      <canvas id="game" width="400" height="640" aria-label="Flappy Bird game canvas" role="img"></canvas>
       <video id="deathVideo" class="death-video" playsinline muted></video>
+      <div id="playerNameDisplay" class="player-name-display">
+        <span id="playerNameText">Player</span>
+        <svg class="edit-icon" width="18" height="18" viewBox="0 0 17 17" fill="#fff" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5.5 1.5 A 2.8 2.8 0 0 0 1.5 5.5 L9.5 13.5 L15.5 15.5 L13.5 9.5 Z" />
+          <path d="M3.5 7.5 L7.5 3.5 M9.5 13.5 L13.5 9.5" />
+          <polygon points="12.5,14.5 15.5,15.5 14.5,12.5" fill="#000" />
+        </svg>
+      </div>
+      <div id="nameModal" class="name-modal hidden">
+        <div class="name-modal-close" id="nameModalClose">✖</div>
+        <h2 class="name-modal-title">Edit your name</h2>
+        <p class="name-modal-subtitle">Shown on the leaderboard.</p>
+        <input type="text" id="nameInput" class="name-input" maxlength="15" autocomplete="off" spellcheck="false" />
+        <button id="nameSaveBtn" class="name-save-btn">SAVE</button>
+      </div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="scripts/main.js"></script>
 </body>
 </html>

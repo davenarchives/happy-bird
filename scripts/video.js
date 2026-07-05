@@ -74,5 +74,7 @@ export function createVideoController(videoEl, sources = []) {
 
   hide();
 
-  return { hide, playRandom };
+  const isVisible = () => videoEl && videoEl.classList.contains('visible');
+
+  return { hide, playRandom, isVisible };
 }

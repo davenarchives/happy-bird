@@ -1,7 +1,7 @@
 export const CANVAS_ID = 'game';
 export const VIDEO_ID = 'deathVideo';
 
-export const CANVAS_SIZE = { width: 360, height: 640 };
+export const CANVAS_SIZE = { width: 400, height: 640 };
 
 export const WORLD = {
   gravity: 0.36,
@@ -14,8 +14,7 @@ export const WORLD = {
   floorY: CANVAS_SIZE.height - 90,
 };
 
-export const UI_FONT =
-  'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
+export const UI_FONT = 'PixelifySans';
 
 export const DIFFICULTY_CAP = 40;
 export const STEPS_PER_MS = 60 / 1000;

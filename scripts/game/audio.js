@@ -27,7 +27,7 @@ const createSoundPlayer = (src, { poolSize = DEFAULT_POOL_SIZE, volume = 1 } = {
 
 export const createAudioBank = () => ({
   wing: createSoundPlayer('game-audio/sfx_wing.wav', { poolSize: 4, volume: 0.55 }),
-  point: createSoundPlayer('game-audio/sfx_point.wav', { poolSize: 2, volume: 0.6 }),
+  point: createSoundPlayer('game-audio/sfx_point.wav', { poolSize: 1, volume: 0.6 }),
   hit: createSoundPlayer('game-audio/sfx_hit.wav', { poolSize: 2, volume: 0.6 }),
   die: createSoundPlayer('game-audio/sfx_die.wav', { poolSize: 2, volume: 0.6 }),
 });
